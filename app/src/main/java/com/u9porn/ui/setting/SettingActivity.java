@@ -218,9 +218,22 @@ public class SettingActivity extends MvpActivity<SettingView, SettingPresenter> 
             }
         });
 
+        //服务器连接重定向时是否弹窗提示
+        boolean isShowUrlRedirectTipDialog = presenter.isShowUrlRedirectTipDialog();
+        QMUICommonListItemView showUrlRedirectTipDialogItemWithSwitch = qmuiGroupListView.createItemView("连接被服务器重定向时弹窗提示");
+        showUrlRedirectTipDialogItemWithSwitch.setAccessoryType(QMUICommonListItemView.ACCESSORY_TYPE_SWITCH);
+        showUrlRedirectTipDialogItemWithSwitch.getSwitch().setChecked(isShowUrlRedirectTipDialog);
+        showUrlRedirectTipDialogItemWithSwitch.getSwitch().setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                presenter.setShowUrlRedirectTipDialog(isChecked);
+            }
+        });
+
         sec.addItemView(itemWithSwitch, null);
         sec.addItemView(itemWithSwitchForbidden, this);
         sec.addItemView(openSkipPageItemWithSwitch, null);
+        sec.addItemView(showUrlRedirectTipDialogItemWithSwitch, null);
         sec.addTo(qmuiGroupListView);
     }
 
@@ -310,10 +323,24 @@ public class SettingActivity extends MvpActivity<SettingView, SettingPresenter> 
         autoCompleteTextView.setText(testBaseUrl);
         if (!TextUtils.isEmpty(testBaseUrl)) {
             autoCompleteTextView.setSelection(testBaseUrl.length());
+        } else {
+            switch (key) {
+                case AppPreferencesHelper.KEY_SP_PORN_91_VIDEO_ADDRESS:
+                    autoCompleteTextView.setText(presenter.getVideo9PornAddress());
+                    break;
+                case AppPreferencesHelper.KEY_SP_FORUM_91_PORN_ADDRESS:
+                    autoCompleteTextView.setText(presenter.getForum9PornAddress());
+                    break;
+                case AppPreferencesHelper.KEY_SP_PIG_AV_ADDRESS:
+                    autoCompleteTextView.setText(presenter.getPavAddress());
+                    break;
+                default:
+            }
         }
         final String[] address = {"http://", "https://", "http://www.", "https://www."};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.item_auto_complete_textview, address);
         autoCompleteTextView.setAdapter(adapter);
+
         okAppCompatButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -369,7 +396,7 @@ public class SettingActivity extends MvpActivity<SettingView, SettingPresenter> 
     /**
      * 刷新为原地址或者最新地址
      *
-     * @param key           key
+     * @param key key
      */
     private void resetOrUpdateAddress(String key) {
         switch (key) {

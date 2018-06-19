@@ -12,9 +12,9 @@ import com.sdsmdg.tastytoast.TastyToast;
 import com.trello.rxlifecycle2.LifecycleProvider;
 import com.u9porn.data.DataManager;
 import com.u9porn.data.db.entity.V9PornItem;
+import com.u9porn.data.db.entity.VideoResult;
 import com.u9porn.data.model.User;
 import com.u9porn.data.model.VideoComment;
-import com.u9porn.data.db.entity.VideoResult;
 import com.u9porn.di.PerActivity;
 import com.u9porn.exception.VideoException;
 import com.u9porn.rxjava.CallBackWrapper;
@@ -22,7 +22,6 @@ import com.u9porn.rxjava.RetryWhenProcess;
 import com.u9porn.rxjava.RxSchedulersHelper;
 import com.u9porn.ui.download.DownloadPresenter;
 import com.u9porn.ui.porn9video.favorite.FavoritePresenter;
-import com.u9porn.utils.UserHelper;
 
 import java.util.Date;
 import java.util.List;
@@ -69,8 +68,8 @@ public class PlayVideoPresenter extends MvpBasePresenter<PlayVideoView> implemen
                             if (VideoResult.OUT_OF_WATCH_TIMES.equals(videoResult.getId())) {
                                 //尝试强行重置，并上报异常
                                 dataManager.resetPorn91VideoWatchTime(true);
-                                Bugsnag.notify(new Throwable(TAG + ":ten videos each day "), Severity.WARNING);
-                                throw new VideoException("观看次数达到上限了！");
+                                Bugsnag.notify(new Throwable(TAG + "Ten videos each day address: " + dataManager.getPorn9VideoAddress()), Severity.WARNING);
+                                throw new VideoException("观看次数达到上限了,请更换地址或者代理服务器！");
                             } else {
                                 throw new VideoException("解析视频链接失败了");
                             }
@@ -98,12 +97,7 @@ public class PlayVideoPresenter extends MvpBasePresenter<PlayVideoView> implemen
                         ifViewAttached(new ViewAction<PlayVideoView>() {
                             @Override
                             public void run(@NonNull PlayVideoView view) {
-                                if (v9PornItem.getVideoResultId() == 0) {
-                                    view.parseVideoUrlSuccess(saveVideoUrl(videoResult, v9PornItem));
-                                } else {
-                                    Logger.t(TAG).d("此次解析仅为了uid，无需重新保存");
-                                    view.parseVideoUrlSuccess(v9PornItem);
-                                }
+                                view.parseVideoUrlSuccess(saveVideoUrl(videoResult, v9PornItem));
                             }
                         });
                     }

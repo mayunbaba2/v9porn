@@ -192,7 +192,7 @@ public class SettingPresenter extends MvpBasePresenter<SettingView> implements I
     public boolean isHaveFinishDownloadVideoFile() {
         if (!TextUtils.isEmpty(dataManager.getCustomDownloadVideoDirPath())) {
             File file = new File(dataManager.getCustomDownloadVideoDirPath());
-            return file.listFiles().length != 0;
+            return file.listFiles() != null && file.listFiles().length != 0;
         }
         File file = new File(SDCardUtils.DOWNLOAD_VIDEO_PATH);
         //检查是否有MP4文件
@@ -361,5 +361,15 @@ public class SettingPresenter extends MvpBasePresenter<SettingView> implements I
     @Override
     public String getPavAddress() {
         return dataManager.getPavAddress();
+    }
+
+    @Override
+    public boolean isShowUrlRedirectTipDialog() {
+        return dataManager.isShowUrlRedirectTipDialog();
+    }
+
+    @Override
+    public void setShowUrlRedirectTipDialog(boolean showUrlRedirectTipDialog) {
+        dataManager.setShowUrlRedirectTipDialog(showUrlRedirectTipDialog);
     }
 }
